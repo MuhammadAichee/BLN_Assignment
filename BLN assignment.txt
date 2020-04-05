@@ -1,0 +1,75 @@
+pragma solidity ^0.4.24;
+pragma experimental ABIEncoderV2;
+pragma solidity ^0.4.13;
+
+contract StudentInfo {
+    struct Student {
+        string Id;
+        string name;
+        string semester;
+        string sgpa;
+    }
+    uint length=0;
+    Student[] public students;
+
+    function addStudent(string _Id, string _name) public returns(uint) {
+        uint i;
+        uint flag=0;
+        for(i=0;i<length;i++){
+            if(keccak256(students[i].Id) == keccak256(_Id))
+            {
+                flag=1;
+                break;
+            }
+        }
+        if(flag==0){
+            length++;
+            students.push(Student(_Id,_name,'',''));
+            
+        }
+        return length;
+    }
+
+    function getStudentsCount() public constant returns(uint) {
+        return length;
+    }
+
+    function getStudent(uint index) public constant returns(string, string, string, string) {
+        return (students[index].Id, students[index].name, students[index].semester, students[index].sgpa);
+    }
+    function getStudentList()public constant returns(string[] memory,string[] memory){
+        string[] memory names = new string[](length);
+        string[] memory ID = new string[](length);
+        
+        for(uint i = 0; i < length; i++) {
+            names[i] = students[i].name;
+            ID[i] = students[i].Id;
+        }
+        return (names,ID);
+    }
+    function updateSgpa(string _ID,string _sgpa) public returns(uint){
+        string[] memory names = new string[](length);
+        string[] memory ID = new string[](length);
+        string[] memory Sgpas = new string[](length);
+        string[] memory semesters = new string[](length);
+        uint i =0;
+        for(i = 0; i < length; i++) {
+            names[i] = students[i].name;
+            ID[i] = students[i].Id;
+            Sgpas[i]=students[i].sgpa;
+            semesters[i]=students[i].semester;
+        }
+        for(i = 0; i < length; i++) {
+            if(keccak256(ID[i]) == keccak256(_ID)){
+                Sgpas[i]=_sgpa;
+            }
+        }
+        for(i = 0; i < length; i++) {
+            students[i].name=names[i];
+            students[i].Id=ID[i];
+            students[i].sgpa=Sgpas[i];
+            students[i].semester=semesters[i];
+        }
+        return length;
+    }
+}
